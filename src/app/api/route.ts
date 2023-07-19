@@ -2,10 +2,10 @@ import { ChatOpenAI } from "langchain/chat_models/openai";
 import { CallbackManager } from "langchain/callbacks";
 import { BufferMemory, ChatMessageHistory } from "langchain/memory";
 import {
-  AIChatMessage,
-  BaseChatMessage,
-  HumanChatMessage,
-  SystemChatMessage,
+  AIMessage,
+  BaseMessage,
+  HumanMessage,
+  SystemMessage,
 } from "langchain/schema";
 import { NextResponse } from "next/server";
 import { ConversationChain } from "langchain/chains";
@@ -19,16 +19,16 @@ import {
 export const runtime = "edge";
 
 function mapStoredMessagesToChatMessages(
-  messages: BaseChatMessage[]
-): BaseChatMessage[] {
+  messages: BaseMessage[]
+): BaseMessage[] {
   return messages.map((message) => {
     switch (message.name) {
       case "human":
-        return new HumanChatMessage(message.text);
+        return new HumanMessage(message.content);
       case "ai":
-        return new AIChatMessage(message.text);
+        return new AIMessage(message.content);
       case "system":
-        return new SystemChatMessage(message.text);
+        return new SystemMessage(message.content);
       default:
         throw new Error("Role must be defined for generic messages");
     }
@@ -46,6 +46,7 @@ export async function POST(req: Request) {
   let counter = 0;
   let string = "";
   const chat = new ChatOpenAI({
+    openAIApiKey: "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",
     streaming: true,
     maxRetries: 1,
     callbackManager: CallbackManager.fromHandlers({
